@@ -1,10 +1,9 @@
-import { respondWithJSON, respondWithError } from "./json.js";
+import { respondWithJSON } from "./json.js";
 export async function handlerChirpsValidate(req, res) {
     const params = req.body;
     const maxChirpLength = 140;
     if (params.body.length > maxChirpLength) {
-        respondWithError(res, 400, "Chirp is too long");
-        return;
+        throw new Error("Chirp is too long");
     }
     const words = params.body.split(" ");
     const badWords = ["kerfuffle", "sharbert", "fornax"];
