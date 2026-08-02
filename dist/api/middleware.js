@@ -11,7 +11,7 @@ export function middlewareLogResponse(req, res, next) {
     next();
 }
 export function middlewareMetricsInc(_, __, next) {
-    config.fileServerHits++;
+    config.api.fileServerHits++;
     next();
 }
 export function errorMiddleWare(err, _, res, __) {
