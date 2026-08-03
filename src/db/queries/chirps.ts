@@ -1,23 +1,20 @@
+import { asc, eq } from "drizzle-orm";
 import { db } from "../index.js";
-import { eq } from "drizzle-orm";
 import { chirps, NewChirp } from "../schema.js";
-import { NotFoundError } from "../../api/errors.js";
-
 
 export async function createChirp(chirp: NewChirp) {
   const [rows] = await db.insert(chirps).values(chirp).returning();
   return rows;
 }
 
-export async function returnAllChirp() {
-  const all = await db.select().from(chirps).orderBy(chirps.createdAt);
-  return all;
+export async function getChirps() {
+  return db.select().from(chirps).orderBy(asc(chirps.createdAt));
 }
 
-export async function returnChirpById(id:string) {
-  const idChirp = await db.select().from(chirps).where(eq(chirps.id, id));
-  if (idChirp.length === 0) {
-    throw new NotFoundError("Can't find the chirp");
+export async function getChirp(id: string) {
+  const rows = await db.select().from(chirps).where(eq(chirps.id, id));
+  if (rows.length === 0) {
+    return;
   }
-  return idChirp[0];
+  return rows[0];
 }

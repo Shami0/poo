@@ -8,9 +8,9 @@ export async function handlerReset(_: Request, res: Response) {
     console.log(config.api.platform);
     throw new UserForbiddenError("Reset is only allowed in dev environment.");
   }
-
   config.api.fileServerHits = 0;
   await reset();
+
   res.write("Hits reset to 0");
   res.end();
 }

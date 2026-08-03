@@ -1,23 +1,11 @@
 import { respondWithJSON } from "./json.js";
-import { createChirp, returnAllChirp, returnChirpById, } from "../db/queries/chirps.js";
+import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
 export async function handlerChirpsCreate(req, res) {
     const params = req.body;
     const cleaned = validateChirp(params.body);
     const chirp = await createChirp({ body: cleaned, userId: params.userId });
     respondWithJSON(res, 201, chirp);
-}
-export async function getAllChirp(_, res) {
-    const allChirp = await returnAllChirp();
-    respondWithJSON(res, 200, allChirp);
-}
-export async function getChirpById(req, res) {
-    const chirpId = req.params.chirpId;
-    const chirp = await returnChirpById(chirpId);
-    if (!chirp) {
-        throw new NotFoundError("Chirp not found"); // if you create a NotFoundError class
-    }
-    respondWithJSON(res, 200, chirp);
 }
 function validateChirp(body) {
     const maxChirpLength = 140;
@@ -38,4 +26,19 @@ function getCleanedBody(body, badWords) {
     }
     const cleaned = words.join(" ");
     return cleaned;
+}
+export async function handlerChirpsRetrieve(_, res) {
+    const chirps = await getChirps();
+    respondWithJSON(res, 200, chirps);
+}
+export async function handlerChirpsGet(req, res) {
+    const { chirpId } = req.params;
+    if (typeof chirpId !== "string") {
+        throw new BadRequestError("Invalid chirp ID");
+    }
+    const chirp = await getChirp(chirpId);
+    if (!chirp) {
+        throw new NotFoundError(`Chirp with chirpId: ${chirpId} not found`);
+    }
+    respondWithJSON(res, 200, chirp);
 }
