@@ -19,4 +19,9 @@ export const config = {
         url: envOrThrow("DB_URL"),
         migrationConfig,
     },
+    jwt: {
+        defaultDuration: 60 * 60, // 1 hour in seconds
+        secret: envOrThrow("JWT_SECRET"),
+        issuer: "chirpy",
+    },
 };

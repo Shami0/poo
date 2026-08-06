@@ -3,17 +3,21 @@ import type { Request, Response } from "express";
 import { respondWithJSON } from "./json.js";
 import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
+import { getBearerToken, validateJWT } from "../auth.js";
+import { config } from "../config.js";
 
 export async function handlerChirpsCreate(req: Request, res: Response) {
   type parameters = {
     body: string;
-    userId: string;
   };
 
   const params: parameters = req.body;
 
+  const token = getBearerToken(req);
+  const userId = validateJWT(token, config.jwt.secret)
+
   const cleaned = validateChirp(params.body);
-  const chirp = await createChirp({ body: cleaned, userId: params.userId });
+  const chirp = await createChirp({ body: cleaned, userId});
 
   respondWithJSON(res, 201, chirp);
 }
