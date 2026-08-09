@@ -21,6 +21,7 @@ export const config = {
     },
     jwt: {
         defaultDuration: 60 * 60, // 1 hour in seconds
+        refreshDuration: 60 * 60 * 24 * 60 * 1000,
         secret: envOrThrow("JWT_SECRET"),
         issuer: "chirpy",
     },
