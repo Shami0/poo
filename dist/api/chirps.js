@@ -1,6 +1,6 @@
 import { respondWithJSON } from "./json.js";
-import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
-import { BadRequestError, NotFoundError } from "./errors.js";
+import { createChirp, deleteChirp, getChirp, getChirps } from "../db/queries/chirps.js";
+import { BadRequestError, NotFoundError, UserForbiddenError } from "./errors.js";
 import { getBearerToken, validateJWT } from "../auth.js";
 import { config } from "../config.js";
 export async function handlerChirpsCreate(req, res) {
@@ -45,4 +45,21 @@ export async function handlerChirpsGet(req, res) {
         throw new NotFoundError(`Chirp with chirpId: ${chirpId} not found`);
     }
     respondWithJSON(res, 200, chirp);
+}
+export async function handlerChirpsDelete(req, res) {
+    const { chirpId } = req.params;
+    if (typeof chirpId !== "string") {
+        throw new BadRequestError("Invalid chirp ID");
+    }
+    const token = getBearerToken(req);
+    const userId = validateJWT(token, config.jwt.secret);
+    const chirp = await getChirp(chirpId);
+    if (!chirp) {
+        throw new NotFoundError(`Chirp with chirpId: ${chirpId} not found`);
+    }
+    if (chirp.userId !== userId) {
+        throw new UserForbiddenError(`the userId does not match`);
+    }
+    await deleteChirp(userId, chirpId);
+    res.status(204).send();
 }
