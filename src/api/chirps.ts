@@ -50,15 +50,29 @@ function getCleanedBody(body: string, badWords: string[]) {
 }
 
 export async function handlerChirpsRetrieve(req: Request, res: Response) {
-
   let authorId = "";
   let authorIdQuery = req.query.authorId;
   if (typeof authorIdQuery === "string") {
     authorId = authorIdQuery;
   }
+
   const chirps = await getChirps(authorId);
+
+  let sortDirection = "asc";
+  let sortDirectionParam = req.query.sort;
+  if (sortDirectionParam === "desc") {
+    sortDirection = "desc";
+  }
+
+  chirps.sort((a, b) =>
+    sortDirection === "asc"
+      ? a.createdAt.getTime() - b.createdAt.getTime()
+      : b.createdAt.getTime() - a.createdAt.getTime(),
+  );
+
   respondWithJSON(res, 200, chirps);
 }
+
 
 export async function handlerChirpsGet(req: Request, res: Response) {
   const { chirpId } = req.params;

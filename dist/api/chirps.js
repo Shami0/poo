@@ -37,7 +37,12 @@ export async function handlerChirpsRetrieve(req, res) {
     if (typeof authorIdQuery === "string") {
         authorId = authorIdQuery;
     }
-    const chirps = await getChirps(authorId);
+    let sorted = "asc";
+    let sort = req.query.sort;
+    if (typeof sort === "string") {
+        sorted = sort;
+    }
+    const chirps = await getChirps(sorted, authorId);
     respondWithJSON(res, 200, chirps);
 }
 export async function handlerChirpsGet(req, res) {
