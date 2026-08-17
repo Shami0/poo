@@ -31,8 +31,13 @@ function getCleanedBody(body, badWords) {
     const cleaned = words.join(" ");
     return cleaned;
 }
-export async function handlerChirpsRetrieve(_, res) {
-    const chirps = await getChirps();
+export async function handlerChirpsRetrieve(req, res) {
+    let authorId = "";
+    let authorIdQuery = req.query.authorId;
+    if (typeof authorIdQuery === "string") {
+        authorId = authorIdQuery;
+    }
+    const chirps = await getChirps(authorId);
     respondWithJSON(res, 200, chirps);
 }
 export async function handlerChirpsGet(req, res) {
@@ -60,6 +65,9 @@ export async function handlerChirpsDelete(req, res) {
     if (chirp.userId !== userId) {
         throw new UserForbiddenError(`the userId does not match`);
     }
-    await deleteChirp(userId, chirpId);
+    const deleted = await deleteChirp(chirpId);
+    if (!deleted) {
+        throw new Error(`Failed to delete chirp with chirpId: ${chirpId}`);
+    }
     res.status(204).send();
 }

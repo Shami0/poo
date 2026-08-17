@@ -62,6 +62,7 @@ export async function handlerLogin(req: Request, res: Response) {
     updatedAt: user.updatedAt,
     token: accessToken,
     refreshToken: refreshToken,
+    isChirpyRed: user.isChirpyRed,
   } satisfies LoginResponse);
 }
 

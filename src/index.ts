@@ -20,6 +20,7 @@ import {
 import { config } from "./config.js";
 import { handlerUsersCreate, handlerUsersUpdate } from "./api/users.js";
 import { handlerLogin, handlerRefresh, handlerRevoke } from "./api/auth.js";
+import { handlerWebhook } from "./api/webhook.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -75,6 +76,12 @@ app.get("/api/chirps/:chirpId", (req, res, next) => {
 app.delete("/api/chirps/:chirpId", (req, res, next) => {
   Promise.resolve(handlerChirpsDelete(req, res)).catch(next);
 })
+
+// webhook
+app.post("/api/polka/webhooks", (req, res, next) => {
+  Promise.resolve(handlerWebhook(req, res)).catch(next);
+})
+
 
 app.use(errorMiddleWare);
 

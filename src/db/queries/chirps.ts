@@ -12,10 +12,11 @@ export async function createChirp(chirp: NewChirp) {
   return rows;
 }
 
-export async function getChirps() {
+export async function getChirps(userId?: string) {
   return db
     .select()
     .from(chirps)
+    .where(userId ? eq(chirps.userId, userId) : undefined)
     .orderBy(asc(chirps.createdAt));
 }
 
@@ -31,15 +32,10 @@ export async function getChirp(id: string) {
   return rows[0];
 }
 
-export async function deleteChirp(userId: string, chirpId: string) {
+export async function deleteChirp(chirpId: string) {
   const [rows] = await db
     .delete(chirps)
-    .where(
-      and(
-        eq(chirps.userId, userId),
-        eq(chirps.id, chirpId)
-      )
-    )
+    .where(eq(chirps.id, chirpId))
     .returning();
   
   return rows;
